@@ -2,6 +2,9 @@
 
 @section('content')
   @include('cabinet.vacancies._nav')
+  <div class="mb-3">
+    <a href="{{ route('cabinet.vacancies.create') }}" class="btn btn-primary">Create</a>
+  </div>
 
   <table class="table table-striped">
     <thead>

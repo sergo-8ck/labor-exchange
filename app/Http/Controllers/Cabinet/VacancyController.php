@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Entity\Vacancy;
 use App\UseCases\Vacancies\VacancyService;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Gate;
 
 class VacancyController extends Controller
 {
@@ -62,9 +62,9 @@ class VacancyController extends Controller
    */
   public function show($id)
   {
-    $user = Auth::user();
     $vacancy = Vacancy::query()->where('id', $id)->first();
-    return view('cabinet.vacancies.show', compact('vacancy', 'user'));
+
+    return view('cabinet.vacancies.show', compact('vacancy'));
   }
 
   /**
@@ -75,7 +75,9 @@ class VacancyController extends Controller
    */
   public function edit($id)
   {
-    //
+    $vacancy = Vacancy::query()->where('id', $id)->first();
+
+    return view('cabinet.vacancies.edit', compact('vacancy'));
   }
 
   /**
@@ -85,9 +87,10 @@ class VacancyController extends Controller
    * @param  int $id
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)
+  public function update(Request $request, Vacancy $vacancy)
   {
-    //
+    $vacancy->update($request->all());
+    return redirect()->route('cabinet.vacancies.index');
   }
 
   /**
@@ -96,8 +99,21 @@ class VacancyController extends Controller
    * @param  int $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy($id)
+  public function destroy(Vacancy $vacancy)
   {
-    //
+    $this->checkAccess($vacancy);
+    try {
+      $this->service->remove($vacancy->id);
+    } catch (\DomainException $e) {
+      return back()->with('error', $e->getMessage());
+    }
+    return redirect()->route('cabinet.vacancies.index');
+  }
+
+  private function checkAccess(Vacancy $vacancy): void
+  {
+    if (!Gate::allows('manage-own-vacancy', $vacancy)) {
+      abort(403);
+    }
   }
 }

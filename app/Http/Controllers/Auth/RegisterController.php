@@ -18,7 +18,7 @@ class RegisterController extends Controller
 
   use RegistersUsers;
 
-  protected $redirectTo = '/home';
+  protected $redirectTo = '/cabinet';
 
   public function __construct(RegisterService $service)
   {
@@ -66,7 +66,7 @@ class RegisterController extends Controller
     $this->guard()->login($user);
 
     return $this->registered($request, $user)
-      ?: redirect($this->redirectPath());
+      ?: redirect('/cabinet');
   }
 
   /**

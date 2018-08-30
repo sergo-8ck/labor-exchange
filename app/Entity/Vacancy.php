@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $status
  *
  * @property User $user
+ * @method Builder active()
+ * @method Builder forUser(User $user)
  */
 class Vacancy extends Model
 {
@@ -22,6 +24,10 @@ class Vacancy extends Model
   public const STATUS_ACTIVE = 'active';
 
   protected $table = 'vacancy';
+
+  protected $fillable = [
+    'title', 'content', 'status'
+  ];
 
   protected $casts = [
     'expires_at' => 'datetime',
@@ -43,6 +49,11 @@ class Vacancy extends Model
       'published_at' => $date,
       'status' => self::STATUS_ACTIVE,
     ]);
+  }
+
+  public function isOnModeration(): bool
+  {
+    return $this->status === self::STATUS_MODERATION;
   }
 
   public function isActive(): bool

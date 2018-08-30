@@ -10,6 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,3 +20,19 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+
+
+Route::group(
+  [
+    'prefix' => 'cabinet',
+    'as' => 'cabinet.',
+    'namespace' => 'Cabinet',
+    'middleware' => ['auth'],
+  ],
+  function () {
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::resource('/vacancies', 'VacancyController');
+    Route::resource('/profile', 'ProfileController');
+  }
+);

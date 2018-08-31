@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Cabinet;
+namespace App\Http\Controllers\Admin;
 
+use App\Entity\Vacancy;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Entity\Vacancy;
 use App\UseCases\Vacancies\VacancyService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class VacancyController extends Controller
 {
-
   private $service;
 
   public function __construct(VacancyService $service)
@@ -19,12 +19,28 @@ class VacancyController extends Controller
     $this->service = $service;
   }
 
-
   public function index()
   {
-    $vacancies = Vacancy::forUser(Auth::user())->orderByDesc('id')->paginate(10);
+    $query = Vacancy::orderByDesc('updated_at');
 
-    return view('cabinet.vacancies.index', compact('vacancies'));
+    $vacancies = $query->paginate(20);
+
+    $statuses = Vacancy::statusesList();
+
+    $roles = User::rolesList();
+
+    return view('admin.vacancies.index', compact('vacancies', 'statuses', 'roles'));
+  }
+
+  public function moderate(Vacancy $vacancy)
+  {
+    try {
+      $this->service->moderate($vacancy->id);
+    } catch (\DomainException $e) {
+      return back()->with('error', $e->getMessage());
+    }
+
+    return redirect()->route('adverts.show', $vacancy);
   }
 
   /**
@@ -34,7 +50,7 @@ class VacancyController extends Controller
    */
   public function create()
   {
-    return view('cabinet.vacancies.create');
+    //
   }
 
   /**
@@ -45,13 +61,7 @@ class VacancyController extends Controller
    */
   public function store(Request $request)
   {
-    try {
-      $vacancy = $this->service->create(Auth::id(), $request);
-    } catch (\DomainException $e) {
-      return back()->with('error', $e->getMessage());
-    }
-
-    return redirect()->route('cabinet.vacancies.show', $vacancy->id);
+    //
   }
 
   /**
@@ -107,7 +117,7 @@ class VacancyController extends Controller
     } catch (\DomainException $e) {
       return back()->with('error', $e->getMessage());
     }
-    return redirect()->route('cabinet.vacancies.index');
+    return redirect()->route('admin.vacancies.index');
   }
 
   private function checkAccess(Vacancy $vacancy): void

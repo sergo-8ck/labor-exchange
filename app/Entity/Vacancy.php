@@ -32,7 +32,13 @@ class Vacancy extends Model
   protected $casts = [
     'expires_at' => 'datetime',
   ];
-
+  public static function statusesList(): array
+  {
+    return [
+      self::STATUS_MODERATION => 'On Moderation',
+      self::STATUS_ACTIVE => 'Active',
+    ];
+  }
   public function sendToModeration(): void
   {
     $this->update([

@@ -32,7 +32,24 @@ Route::group(
   ],
   function () {
     Route::get('/', 'HomeController@index')->name('home');
-    Route::resource('/vacancies', 'VacancyController');
-    Route::resource('/profile', 'ProfileController');
+    Route::resource('vacancies', 'VacancyController');
+    Route::resource('profile', 'ProfileController');
   }
 );
+
+Route::group(
+  [
+    'prefix' => 'admin',
+    'as' => 'admin.',
+    'namespace' => 'Admin',
+    'middleware' => ['auth', 'can:admin-panel'],
+  ],
+  function () {
+    Route::get('/', 'HomeController@index')->name('home');
+    Route::resource('users', 'UsersController');
+    Route::resource('vacancies', 'VacancyController');
+    Route::resource('profile', 'ProfileController');
+    Route::post('/vacancy/{vacancy}/moderate', 'VacancyController@moderate')->name('vacancies.moderate');
+  }
+);
+

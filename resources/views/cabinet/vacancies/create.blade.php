@@ -8,7 +8,7 @@
 
         <div class="card mb-3">
             <div class="card-header">
-                Common
+                Creating vacancy
             </div>
             <div class="card-body pb-2">
                 <div class="row">
@@ -19,6 +19,9 @@
                             @if ($errors->has('title'))
                                 <span class="invalid-feedback"><strong>{{ $errors->first('title') }}</strong></span>
                             @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-form-label">Email: {{auth()->user()->email}}</label>
                         </div>
                     </div>
                 </div>

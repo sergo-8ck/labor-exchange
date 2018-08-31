@@ -31,6 +31,23 @@ class AuthServiceProvider extends ServiceProvider
   }
   private function registerPermissions(): void
   {
+    Gate::define('admin-panel', function (User $user) {
+      return $user->isAdmin();
+    });
+    Gate::define('manage-pages', function (User $user) {
+      return $user->isAdmin();
+    });
+    Gate::define('manage-users', function (User $user) {
+      return $user->isAdmin();
+    });
+    Gate::define('manage-vacancies', function (User $user) {
+      return $user->isAdmin();
+    });
+
+    Gate::define('show-vacancy', function (User $user, Vacancy $vacancy) {
+      return $user->isAdmin() || $vacancy->user_id === $user->id;
+    });
+
     Gate::define('manage-own-vacancy', function (User $user, Vacancy $vacancy) {
       return $vacancy->user_id === $user->id;
     });
